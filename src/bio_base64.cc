@@ -75,6 +75,7 @@ int base64_decode(const char * in, int len, unsigned char * data) {
 
     // BIO Link
     BIO_push(bio_base64_f, bio_mem_buf);
+    BIO_set_flags(bio_base64_f, BIO_FLAGS_BASE64_NO_NL);
 
     // BIO Read: decode
     size_t size = 0;
