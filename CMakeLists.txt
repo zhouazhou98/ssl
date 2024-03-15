@@ -26,6 +26,7 @@ include_directories(. ../openssl-3.2.1/include/)
 # 将源码文件设置到变量 LIB_SRC
 set(LIB_SRC
     src/ssl.cc
+    src/base16.cc
     )
 
 
@@ -61,6 +62,15 @@ set( SSL_SO
 
 # 生成测试文件 test                    
 set(TEST_EXEC test)
+add_executable(${TEST_EXEC} tests/${TEST_EXEC}.cc)
+# 测试文件 test 依赖于我们生成的共享库 zhou.so  
+add_dependencies(${TEST_EXEC} ssl-code)    
+# 其链接时需要链接到 zhou.so 共享库          
+target_link_libraries(${TEST_EXEC} ssl-code ${SSL_SO}) 
+# target_link_libraries(${TEST_EXEC} ssl-code OpenSSL::SSL) 
+
+# 生成测试文件 test                    
+set(TEST_EXEC test_base16)
 add_executable(${TEST_EXEC} tests/${TEST_EXEC}.cc)
 # 测试文件 test 依赖于我们生成的共享库 zhou.so  
 add_dependencies(${TEST_EXEC} ssl-code)    
