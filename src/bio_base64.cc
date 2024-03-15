@@ -22,6 +22,7 @@ int base64_encode(const unsigned char * in, int len, char * base64) {
 
     // BIO Link: BIO 链表，头节点 bio_base64_f ， 下一个节点 bio_mem_s
     BIO_push(bio_base64_f, bio_mem_s);
+    BIO_set_flags(bio_base64_f, BIO_FLAGS_BASE64_NO_NL);
 
     // BIO Write
     int ret = BIO_write(bio_base64_f, in, len);
@@ -53,4 +54,31 @@ int base64_encode(const unsigned char * in, int len, char * base64) {
     BIO_free_all(bio_base64_f);
     return 0;
 
+}
+
+
+
+int base64_decode(const char * in, int len, unsigned char * data) {
+    if (!in || !data || len <= 0)
+        return 0;
+
+    // BIO Source Memory
+    BIO * bio_mem_buf =  BIO_new_mem_buf(in, len);
+    if (!bio_mem_buf) return 0;
+
+    // BIO Filter BASE64
+    BIO * bio_base64_f = BIO_new(BIO_f_base64());
+    if (!bio_base64_f) {
+        BIO_free(bio_mem_buf);
+        return 0;
+    }
+
+    // BIO Link
+    BIO_push(bio_base64_f, bio_mem_buf);
+
+    // BIO Read: decode
+    size_t size = 0;
+    BIO_read_ex(bio_base64_f, data, len, &size);
+    BIO_free_all(bio_base64_f);
+    return size;
 }
